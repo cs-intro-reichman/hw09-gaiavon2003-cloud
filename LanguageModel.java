@@ -36,6 +36,7 @@ public class LanguageModel {
 		// Your code goes here
         In in = new In(fileName);
         String corpus = in.readAll();
+        corpus = corpus.replace("\r\n", "\n");
         for (int i = 0; i < corpus.length() - windowLength; i++){
             String window = corpus.substring(i, i + windowLength);
             char nextChar = corpus.charAt(i + windowLength);
@@ -57,7 +58,8 @@ public class LanguageModel {
 		// Your code goes here
         int totalCount = 0;
         for (int i = 0; i < probs.getSize(); i++){
-            totalCount += probs.get(i).count;
+            CharData cd = probs.get(i);
+            totalCount += cd.count;
         }
         double cumulativeProb = 0.0;
         for (int i = 0; i < probs.getSize(); i++){
