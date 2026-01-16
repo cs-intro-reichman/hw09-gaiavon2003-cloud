@@ -94,7 +94,8 @@ public class List {
         }
         if (first.cp.chr == chr){
           first = first.next;
-          size--;  
+          size--; 
+          return true; 
         }
         Node prev = first;
         Node current = first.next;
