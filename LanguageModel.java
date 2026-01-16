@@ -35,22 +35,29 @@ public class LanguageModel {
 	public void train(String fileName) {
 		// Your code goes here
         In in = new In(fileName);
-        String corpus = in.readAll();
-        corpus = corpus.replace("\r\n", "\n");
-        for (int i = 0; i < corpus.length() - windowLength; i++){
-            String window = corpus.substring(i, i + windowLength);
-            char nextChar = corpus.charAt(i + windowLength);
-            List probs = CharDataMap.get(window);
-            if (probs == null){
+        String window = "";
+        char c;
+        for (int i = 0; i < windowLength; i++){
+            if (!in.isEmpty()){
+               window += in.readChar(); 
+            }
+        }
+        while (!in.isEmpty()){
+           c = in.readChar();
+           List probs = CharDataMap.get(window);
+           if (probs == null){
                 probs = new List();
                 CharDataMap.put(window, probs);
             }
-            probs.update(nextChar);
+            probs.update(c);
+            window = window.substring(1) + c;
+
         }
         for (List probs : CharDataMap.values()){
             calculateProbabilities(probs);
         }
-	}
+    }
+ 
 
     // Computes and sets the probabilities (p and cp fields) of all the
 	// characters in the given list. */
