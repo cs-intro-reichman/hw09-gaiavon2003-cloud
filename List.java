@@ -75,13 +75,12 @@ public class List {
      *  given chr to the beginning of this list. */
     public void update(char chr) {
         // Your code goes here
-        int index = indexOf(chr);
-        if( index != -1){
-            CharData cd = get(index);
-            cd.count++;
-        } else{
-            addFirst(chr);
-        }
+    int index = indexOf(chr);
+    if (index != -1){
+        get(index).count++;
+    }else{
+        addFirst(chr);
+     }
     }
 
     /** GIVE If the given character exists in one of the CharData objects
