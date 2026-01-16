@@ -123,13 +123,6 @@ public class LanguageModel {
 
     public static void main(String[] args) {
 		// Your code goes here
-    int windowLength = 5;
-    LanguageModel lm = new LanguageModel(windowLength);
-    lm.train("shakespeareinlove.txt");
-    String prompt = "THE ROSE";
-    int totalLength = 300;
-    String result = lm.generate(prompt, totalLength);
-    System.out.println("--- Generated Shakespeare-ish Text ---");
-    System.out.println(result);
+   
     }
 }
