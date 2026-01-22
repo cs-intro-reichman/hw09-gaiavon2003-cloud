@@ -64,16 +64,20 @@ public class LanguageModel {
 	void calculateProbabilities(List probs) {				
 		// Your code goes here
         int totalCount = 0;
-        for (int i = 0; i < probs.getSize(); i++){
-            CharData cd = probs.get(i);
-            totalCount += cd.count;
+        ListIterator it = probs.listIterator(0);
+        while (it.hasNext()){
+            totalCount += it.next().count;
         }
         double cumulativeProb = 0.0;
-        for (int i = 0; i < probs.getSize(); i++){
-            CharData cd = probs.get(i);
+        it = probs.listIterator(0);
+        while (it.hasNext()){
+            CharData cd = it.next();
             cd.p = (double) cd.count / totalCount;
             cumulativeProb += cd.p;
             cd.cp = cumulativeProb;
+            if (!it.hasNext()){
+                cd.cp = 1.0;
+            }
         }
 	}
 
@@ -81,14 +85,15 @@ public class LanguageModel {
 	char getRandomChar(List probs) {
 		// Your code goes here
         double r = randomGenerator.nextDouble();
-        for (int i = 0; i < probs.getSize(); i++){
-           CharData cd = probs.get(i); 
-           if (cd.cp > r){
+        ListIterator it = probs.listIterator(0);
+        while (it.hasNext()){
+            CharData cd = it.next();
+            if (cd.cp > r){
                 return cd.chr;
-           }
+            }
         }
-
-		return probs.get(probs.getSize() - 1).chr;
+        return probs.get(probs.getSize() - 1).chr;
+   
 	}
 
     /**
