@@ -37,59 +37,53 @@ public class LanguageModel {
         String window = "";
         char c;
         In in = new In(fileName);
-        for ( int i = 0; i < windowLength ; i++){
-            window += in.readChar();
+        while ((!in.isEmpty()) && (window.length() < windowLength)){
+            c  = in.readChar();
+			window += c;
         }
-        while (!in.isEmpty()){
-            c = in.readChar();
-            List prob = CharDataMap.get(window);
-            if( prob== null){
-                 prob = new List();
-                CharDataMap.put(window,prob);
+        while (!in.isEmpty()) {
+			c  = in.readChar();
+            List probs = CharDataMap.get(window);
+            if (probs == null){
+                probs = new List();
+				CharDataMap.put(window, probs);
             }
-            prob.update(c);
-            window = window.substring(1)+ c ;
-            for (List probs : CharDataMap.values())
-                calculateProbabilities(probs);
 
+            probs.update(c);
+            window += c;
+			window = window.substring(1, window.length());
         }
-     
+        for (List probs : CharDataMap.values())
+			calculateProbabilities(probs);
     }
- 
 
     // Computes and sets the probabilities (p and cp fields) of all the
 	// characters in the given list. */
 	void calculateProbabilities(List probs) {				
 		// Your code goes here
-        int sum = 0;
-        ListIterator itr1 = probs.listIterator(0);
-        while (itr1.hasNext()) {
-            CharData cd = itr1.next();
-            sum += cd.count;
-        }
-        double cumulativeProb = 0.0;
-        ListIterator itr2 = probs.listIterator(0);
-        while (itr2.hasNext()){
-            CharData cg = itr2.next();
-            cg.p = (double) cg.count / sum;
-            cumulativeProb += cg.p;
-            cg.cp = cumulativeProb;
-        }
+        int windowTotal = 0;
+		for (int i = 0; i < probs.getSize(); ++i) {
+			windowTotal += probs.get(i).count;
+		}
+        for (int i = 0; i < probs.getSize(); ++i) {
+			probs.get(i).p = probs.get(i).count / (double)windowTotal;
+            probs.get(i).cp = probs.get(i).p + (i > 0 ? probs.get(i - 1).cp : 0); 
+        }    
+   
 	}
 
     // Returns a random character from the given probabilities list.
 	char getRandomChar(List probs) {
 		// Your code goes here
-        double x = randomGenerator.nextDouble();
-        ListIterator itr = probs.listIterator(0);
-        CharData cd = null;
-        while (itr.hasNext()){
-            cd = itr.next();
-            if( cd.cp > x){
-                return cd.chr;
-            }
-        }
-        return cd.chr;
+   	    double random = randomGenerator.nextDouble();
+	    char charToReturn = ' ';
+		for (int i = 0; i < probs.getSize(); ++i) {
+			if (random < probs.get(i).cp) {
+				charToReturn = probs.get(i).chr;
+				break;
+			}
+		}
+		return charToReturn;
 	}
 
     /**
@@ -105,17 +99,16 @@ public class LanguageModel {
            return initialText; 
         }
         String generatedText = initialText;
-        String window = initialText.substring(initialText.length() - windowLength);
-        while (generatedText.length() < textLength){
-            List probs = CharDataMap.get(window);
-            if (probs == null){
-                return generatedText;
-            }
-            char nextChar = getRandomChar(probs);
-            generatedText += nextChar;
-            window = generatedText.substring(generatedText.length() - windowLength);
-        }
-        return generatedText;
+		for (int i = 0; i < textLength; ++i) {
+			// Extracts the window from the generated text, which is exactly the last windowLength characters
+			String window = generatedText.substring(generatedText.length() - windowLength, generatedText.length());
+			List probs = CharDataMap.get(window);
+			if (probs == null)
+				return generatedText;
+
+			generatedText += getRandomChar(probs);
+		}
+		return generatedText;
 
 	}
 
