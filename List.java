@@ -30,27 +30,28 @@ public class List {
 
     /** GIVE Adds a CharData object with the given character to the beginning of this list. */
     public void addFirst(char chr) {
-        // Your code goes here
-        CharData newCharData = new CharData(chr);
-        Node newNode = new Node( newCharData, first);
-        first = newNode;
-        size++;
+        // Your code goes here\
+       CharData newchardata = new CharData(chr);
+       Node newNode = new Node(newchardata);
+       newNode.next = first;
+       first = newNode;
+       size++;
     }
     
     /** GIVE Textual representation of this list. */
     public String toString() {
         // Your code goes here
-        String str = "(";
-        Node current = first;
-        while (current != null){
-            str += current.cp.toString();
-            current = current.next;
-            if (current != null){
-                str += " ";
-            }
-        }
-
-        return str + ")";
+      if( size == 0){
+        return "()";
+      }
+      String str = "(";
+      Node current = first;
+      while (current != null) {
+        str += current.toString() + " ";
+        current = current.next;
+        
+      }
+      return str.substring(0, str.length()-1) + ")";
     }
 
     /** Returns the index of the first CharData object in this list
@@ -61,7 +62,7 @@ public class List {
         Node current = first;
         int index = 0;
         while (current != null) {
-            if(current.cp.chr == chr){
+            if(current.cp.equals(chr)){
                 return index;
             }
             current = current.next;
@@ -75,12 +76,16 @@ public class List {
      *  given chr to the beginning of this list. */
     public void update(char chr) {
         // Your code goes here
-    int index = indexOf(chr);
-    if (index != -1){
-        get(index).count++;
-    }else{
+        Node current = first;
+        while (current != null){
+            if (current.cp.chr == chr){
+                current.cp.count++;
+                return;
+            }
+            current = current.next;
+        }
         addFirst(chr);
-     }
+   
     }
 
     /** GIVE If the given character exists in one of the CharData objects
@@ -88,26 +93,25 @@ public class List {
      *  true. Otherwise, returns false. */
     public boolean remove(char chr) {
         // Your code goes here
-        if (first == null){
-            return false;
-        }
-        if (first.cp.chr == chr){
-          first = first.next;
-          size--; 
-          return true; 
-        }
-        Node prev = first;
-        Node current = first.next;
-        while (current != null){
-            if( current.cp.chr == chr){
-                prev.next = current.next;
-                size--;
-                return true;
-            }
-            prev = current;
+        Node current = first;
+        Node perv = null;
+        while(current != null && !(current.cp.equals(chr))){
+            perv = current;
             current = current.next;
         }
-        return false;
+        if( current == null){
+            return false;
+        }
+        if( perv == null){
+            first = first.next;
+            size--;
+            return true;
+        }
+        else{
+            perv.next= current.next;
+            size--;
+            return true;
+        }
     }
 
     /** Returns the CharData object at the specified index in this list. 
@@ -115,11 +119,13 @@ public class List {
      *  throws an IndexOutOfBoundsException. */
     public CharData get(int index) {
         // Your code goes here
-        if (index < 0 || index >= size){
-            throw new IndexOutOfBoundsException("Index " + index + " is out of bounds.");
+        if( index < 0 || index > (size -1)){
+            throw new IndexOutOfBoundsException( index + " is out of bounds");
         }
+        int count = 0;
         Node current = first;
-        for( int i = 0; i< index; i++){
+        while (count != index) {
+            count ++;
             current = current.next;
         }
         return current.cp;
@@ -139,16 +145,22 @@ public class List {
 
     /** Returns an iterator over the elements in this list, starting at the given index. */
     public ListIterator listIterator(int index) {
-	    // If the list is empty, there is nothing to iterate   
-	    if (size == 0) return null;
+	    // If the list is empty, there is nothing to iterate 
+        if ( size == 0 || index > (size -1) ||index < 0 ){
+            throw new IndexOutOfBoundsException( index + " is out of bounds");
+        }  
+	    
 	    // Gets the element in position index of this list
-	    Node current = first;
-	    int i = 0;
-        while (i < index) {
-            current = current.next;
-            i++;
+        Node start =  first;
+        int count = 0;
+        while ( count != index){
+            count++;
+            start = start.next;
         }
+        ListIterator listIterator = new  ListIterator(start);
+        return listIterator;
+	   
         // Returns an iterator that starts in that element
-	    return new ListIterator(current);
+	    
     }
 }

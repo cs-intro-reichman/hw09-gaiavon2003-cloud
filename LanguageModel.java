@@ -37,23 +37,21 @@ public class LanguageModel {
         String window = "";
         char c;
         In in = new In(fileName);
-        for (int i = 0; i < windowLength; i++){
-            if (!in.isEmpty()){
-                window += in.readChar();
-            }
+        for ( int i = 0; i < windowLength ; i++){
+            window += in.readChar();
         }
         while (!in.isEmpty()){
             c = in.readChar();
-            List probs = CharDataMap.get(window);
-            if (probs == null){
-                probs = new List();
-                CharDataMap.put(window, probs);
+            List prob = CharDataMap.get(window);
+            if( prob== null){
+                 prob = new List();
+                CharDataMap.put(window,prob);
             }
-            probs.update(c);
-            window = window.substring(1) + c;
-        }
-        for (List probs : CharDataMap.values()){
-            calculateProbabilities(probs);
+            prob.update(c);
+            window = window.substring(1)+ c ;
+            for (List probs : CharDataMap.values())
+                calculateProbabilities(probs);
+
         }
      
     }
@@ -63,37 +61,35 @@ public class LanguageModel {
 	// characters in the given list. */
 	void calculateProbabilities(List probs) {				
 		// Your code goes here
-        int totalCount = 0;
-        ListIterator it = probs.listIterator(0);
-        while (it.hasNext()){
-            totalCount += it.next().count;
+        int sum = 0;
+        ListIterator itr1 = probs.listIterator(0);
+        while (itr1.hasNext()) {
+            CharData cd = itr1.next();
+            sum += cd.count;
         }
         double cumulativeProb = 0.0;
-        it = probs.listIterator(0);
-        while (it.hasNext()){
-            CharData cd = it.next();
-            cd.p = (double) cd.count / totalCount;
-            cumulativeProb += cd.p;
-            cd.cp = cumulativeProb;
-            if (!it.hasNext()){
-                cd.cp = 1.0;
-            }
+        ListIterator itr2 = probs.listIterator(0);
+        while (itr2.hasNext()){
+            CharData cg = itr2.next();
+            cg.p = (double) cg.count / sum;
+            cumulativeProb += cg.p;
+            cg.cp = cumulativeProb;
         }
 	}
 
     // Returns a random character from the given probabilities list.
 	char getRandomChar(List probs) {
 		// Your code goes here
-        double r = randomGenerator.nextDouble();
-        ListIterator it = probs.listIterator(0);
-        while (it.hasNext()){
-            CharData cd = it.next();
-            if (cd.cp > r){
+        double x = randomGenerator.nextDouble();
+        ListIterator itr = probs.listIterator(0);
+        CharData cd = null;
+        while (itr.hasNext()){
+            cd = itr.next();
+            if( cd.cp > x){
                 return cd.chr;
             }
         }
-        return probs.get(probs.getSize() - 1).chr;
-   
+        return cd.chr;
 	}
 
     /**
@@ -108,21 +104,19 @@ public class LanguageModel {
         if (initialText.length() < windowLength){
            return initialText; 
         }
-        StringBuilder generatedText = new StringBuilder(initialText);
-        String window = "";
+        String generatedText = initialText;
+        String window = initialText.substring(initialText.length() - windowLength);
         while (generatedText.length() < textLength){
-            int startIdx = generatedText.length() - windowLength;
-            window = generatedText.substring(startIdx);
             List probs = CharDataMap.get(window);
-            if (probs != null){
-                char nextChar = getRandomChar(probs);
-                generatedText.append(nextChar);
-            } else {
-                break;
+            if (probs == null){
+                return generatedText;
             }
-
+            char nextChar = getRandomChar(probs);
+            generatedText += nextChar;
+            window = generatedText.substring(generatedText.length() - windowLength);
         }
-        return generatedText.toString();
+        return generatedText;
+
 	}
 
     /** Returns a string representing the map of this language model. */
