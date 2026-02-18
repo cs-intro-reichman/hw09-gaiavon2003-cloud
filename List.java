@@ -30,13 +30,31 @@ public class List {
 
     /** GIVE Adds a CharData object with the given character to the beginning of this list. */
     public void addFirst(char chr) {
-        // Your code goes here
+        // Your code goes here\
+       Node newNode = new Node(new CharData(chr));
+       newNode.next = first;
+       first = newNode;
+       size++;
     }
     
     /** GIVE Textual representation of this list. */
     public String toString() {
         // Your code goes here
-        return "";
+    if( size == 0){
+     return "()";
+      }
+    StringBuilder str = new StringBuilder("(");
+      
+    Node current = first;
+    while (current != null) {
+        str.append(current.cp + " ");
+        current = current.next;
+        
+      }
+    str.deleteCharAt(str.length() - 1);
+    str.append(")");
+    return str.toString();
+      
     }
 
     /** Returns the index of the first CharData object in this list
@@ -44,6 +62,15 @@ public class List {
      *  or -1 if there is no such object in this list. */
     public int indexOf(char chr) {
         // Your code goes here
+        Node current = first;
+        int index = 0;
+        while (current != null) {
+            if(current.cp.equals(chr)){
+                return index;
+            }
+            current = current.next;
+            index++;
+        }
         return -1;
     }
 
@@ -52,6 +79,14 @@ public class List {
      *  given chr to the beginning of this list. */
     public void update(char chr) {
         // Your code goes here
+        int index = indexOf(chr); 
+        if (index == -1) {
+            addFirst(chr);
+        } else { 
+            CharData cp = get(index);
+            cp.count++;
+        }
+   
     }
 
     /** GIVE If the given character exists in one of the CharData objects
@@ -59,7 +94,22 @@ public class List {
      *  true. Otherwise, returns false. */
     public boolean remove(char chr) {
         // Your code goes here
-        return false;
+        if (indexOf(chr) == -1) return false;
+        Node prev = null;
+        Node current = first;
+        while (!current.cp.equals(chr)) {
+            prev = current;
+            current = current.next;
+        }
+        
+        if (prev == null) {
+            first = current.next;
+        } else {
+            prev.next = current.next;
+        }
+        current = null; 
+        size--;
+        return true;
     }
 
     /** Returns the CharData object at the specified index in this list. 
@@ -67,7 +117,16 @@ public class List {
      *  throws an IndexOutOfBoundsException. */
     public CharData get(int index) {
         // Your code goes here
-        return null;
+        if( index < 0 || index > (size -1)){
+            throw new IndexOutOfBoundsException( index + " is out of bounds");
+        }
+        Node current = first;
+        int i = 0;
+        while (i < index) {
+            current = current.next;
+            i++;
+        }
+        return current.cp;
     }
 
     /** Returns an array of CharData objects, containing all the CharData objects in this list. */
@@ -84,16 +143,22 @@ public class List {
 
     /** Returns an iterator over the elements in this list, starting at the given index. */
     public ListIterator listIterator(int index) {
-	    // If the list is empty, there is nothing to iterate   
-	    if (size == 0) return null;
+	    // If the list is empty, there is nothing to iterate 
+        if ( size == 0 || index > (size -1) ||index < 0 ){
+            throw new IndexOutOfBoundsException( index + " is out of bounds");
+        }  
+	    
 	    // Gets the element in position index of this list
-	    Node current = first;
-	    int i = 0;
-        while (i < index) {
-            current = current.next;
-            i++;
+        Node start =  first;
+        int count = 0;
+        while ( count != index){
+            count++;
+            start = start.next;
         }
+        ListIterator listIterator = new  ListIterator(start);
+        return listIterator;
+	   
         // Returns an iterator that starts in that element
-	    return new ListIterator(current);
+	    
     }
 }
