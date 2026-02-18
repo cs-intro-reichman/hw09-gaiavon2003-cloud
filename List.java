@@ -94,7 +94,8 @@ public class List {
      *  true. Otherwise, returns false. */
     public boolean remove(char chr) {
         // Your code goes here
-         Node prev = null;
+        if (indexOf(chr) == -1) return false;
+        Node prev = null;
         Node current = first;
         while (!current.cp.equals(chr)) {
             prev = current;
